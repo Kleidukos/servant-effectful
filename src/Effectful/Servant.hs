@@ -3,48 +3,39 @@
 
 module Effectful.Servant where
 
-import Effectful
-import Effectful.Error.Static
-import Servant.Server (ServerError, ServerT, Application, HasServer, Handler, Server, hoistServer, ServerContext, Context)
-import Effectful.Dispatch.Static
-import qualified Control.Monad.Except as T
-import qualified Servant.Server as Servant
-import Data.Proxy (Proxy(..))
 import Data.Kind (Type)
-import Servant.Server.Generic (AsServerT)
+import Data.Proxy (Proxy(..))
+import Effectful
+import Effectful.Dispatch.Static
+import Effectful.Error.Static
 import Servant.API.Generic (GenericServant, AsApi, ToServantApi, ToServant)
+import Servant.Server (ServerError, ServerT, Application, HasServer, Handler, Server, hoistServer, ServerContext, Context)
+import Servant.Server.Generic (AsServerT)
+import qualified Control.Monad.Except as T
 import qualified Network.Wai.Handler.Warp as Warp
+import qualified Servant.Server as Servant
 
 data Servant :: Effect
 
 type instance DispatchOf Servant = Static WithSideEffects
-newtype instance StaticRep Servant = Servant Warp.Settings
 
--- | Run a 'Servant' computation with the specified settings
-runServant :: IOE :> es
-           => Warp.Settings -- ^ Settings for the webserver
-           -> Eff (Servant : es) a -- ^ The computation to run
-           -> Eff es a
-runServant settings = evalStaticRep (Servant settings)
+runWarpServerSettings :: forall (es :: [Effect]) (api :: Type). (HasServer api '[])
+                      => Warp.Settings
+                      -> ServerT api (Eff [Error ServerError, IOE])
+                      -> Eff es ()
+runWarpServerSettings settings server = do
+  unsafeEff_ $ Warp.runSettings settings (serveEff @api server)
 
-runWarpServerSettings :: forall (es :: [Effect]) (api :: Type).
-                         (Servant :> es, Error ServerError :> es, IOE :> es)
-                      => ServerT api (Eff es) -> Eff es ()
-runWarpServerSettings server = do
-  Servant settings <- getStaticRep
-  unsafeEff_ $ Warp.runSettings settings (serveEff @es @api server)
-
-serveEff :: forall (es :: [Effect]) (api :: Type).
-            (HasServer api '[], Error ServerError :> es, IOE :> es)
-         => ServerT api (Eff es)
+serveEff :: forall (api :: Type). (HasServer api '[])
+         => ServerT api (Eff '[Error ServerError, IOE])
          -> Application
 serveEff computation = do
   let api = Proxy @api
-  Servant.serve api (Servant.hoistServer api effToHandler computation)
+   in Servant.serve api (Servant.hoistServer @api api effToHandler computation)
 
-effToHandler :: forall (es :: [Effect]) (a :: Type).
-                (Error ServerError :> es, IOE :> es)
-             => Eff es a  -> Handler a
+effToHandler :: forall (a :: Type). ()
+             => Eff '[Error ServerError, IOE] a
+             -> Handler a
 effToHandler computation = do
   v <- liftIO . runEff . runErrorNoCallStack @ServerError $ computation
   either T.throwError pure v
