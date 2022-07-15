@@ -1,6 +1,5 @@
 {-# LANGUAGE AllowAmbiguousTypes #-}
 {-# LANGUAGE RankNTypes #-}
-{-# OPTIONS_GHC -Wno-unused-imports #-}
 
 module Effectful.Servant where
 
@@ -9,19 +8,15 @@ import Data.Proxy (Proxy(..))
 import Effectful
 import Effectful.Dispatch.Static
 import Effectful.Error.Static
-import Servant.API.Generic (GenericServant, AsApi, ToServantApi, ToServant)
-import Servant.Server (ServerError, ServerT, Application, HasServer, Handler, Server, hoistServer, ServerContext, Context)
-import Servant.Server.Generic (AsServerT)
+import Servant.Server (ServerError, ServerT, Application, HasServer, Handler, Server, hoistServer)
 import qualified Control.Monad.Except as T
 import qualified Network.Wai.Handler.Warp as Warp
 import qualified Servant.Server as Servant
 
-type ServerEff api es = ServerT api (Eff es)
-
 runWarpServerSettings :: forall (api :: Type) (es :: [Effect]).
                          (HasServer api '[], IOE :> es, Error ServerError :> es)
                       => Warp.Settings
-                      -> ServerEff api es
+                      -> ServerT api (Eff es)
                       -> Eff es ()
 runWarpServerSettings settings server = do
   withEffToIO $ \runInIO -> do
@@ -32,7 +27,7 @@ runWarpServerSettings settings server = do
 serveEff :: forall (api :: Type) (es :: [Effect]).
             (HasServer api '[], Error ServerError :> es)
          => (forall x. Eff es x -> IO x)
-         -> ServerEff api es
+         -> ServerT api (Eff es)
          -> Application
 serveEff runInIO server = do
   let api = Proxy @api
@@ -41,7 +36,7 @@ serveEff runInIO server = do
 hoistServerEff :: (HasServer api '[], Error ServerError :> es)
                => Proxy api
                -> (forall x. Eff es x -> IO x)
-               -> ServerEff api es
+               -> ServerT api (Eff es)
                -> Server api
 hoistServerEff api runInIO = Servant.hoistServer api (effToHandlerWith runInIO)
 
