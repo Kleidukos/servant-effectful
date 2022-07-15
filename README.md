@@ -1,3 +1,3 @@
-# effectful-servant [![CI-badge][CI-badge]][CI-url]
+# servant-effectful [![CI-badge][CI-badge]][CI-url]
 
 Work in progress
