@@ -75,3 +75,4 @@ test-suite servant-effectful-test
     , hashable
     , tasty
     , tasty-hunit
+    , text
