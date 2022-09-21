@@ -13,10 +13,25 @@ import Servant.API.Generic (GenericServant, AsApi, ToServantApi, ToServant)
 import Servant.Server (ServerError, ServerT, Application, HasServer, Handler, Server, hoistServer, ServerContext, Context)
 import Servant.Server.Generic (AsServerT)
 import qualified Control.Monad.Except as T
+import qualified Network.Wai as Wai
 import qualified Network.Wai.Handler.Warp as Warp
 import qualified Servant.Server as Servant
 
 type ServerEff api es = ServerT api (Eff es)
+
+runWarpServerSettingsContext :: forall (api :: Type) (context :: [Type]) (es :: [Effect]).
+                                (HasServer api context, ServerContext context, [IOE, Error ServerError] :>> es)
+                             => Warp.Settings
+                             -> Context context
+                             -> ServerEff api es
+                             -> Wai.Middleware
+                             -> Eff es ()
+runWarpServerSettingsContext settings cfg server middleware = do
+  withEffToIO $ \runInIO -> do
+    let api = Proxy @api
+        ctx = Proxy @context
+        server' = Servant.hoistServerWithContext @api @context api ctx (effToHandlerWith runInIO) server
+    Warp.runSettings settings $ middleware $ Servant.serveWithContext api cfg server'
 
 runWarpServerSettings :: forall (api :: Type) (es :: [Effect]).
                          (HasServer api '[], IOE :> es, Error ServerError :> es)
