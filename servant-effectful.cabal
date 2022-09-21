@@ -52,7 +52,7 @@ library
     , base            <=4.17
     , servant
     , servant-server
-    , effectful-core ^>=1.0.0.0
+    , effectful-core  <= 3
     , hashable
     , mtl
     , warp
