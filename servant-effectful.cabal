@@ -51,14 +51,14 @@ library
   hs-source-dirs:  src
   exposed-modules: Effectful.Servant
   build-depends:
-    , base            <4.17.0
+    , base            <5
     , effectful-core  ^>=1.0.0.0 && <3.0
-    , hashable        >=1.4.1    && <1.5
-    , mtl             >=2.2.2    && <2.3
-    , servant         >=0.19.1   && <0.20
-    , servant-server  >=0.19.2   && <0.20
-    , wai             >=3.2.3    && <3.3
-    , warp            >=3.3.23   && <3.4
+    , hashable        ^>=1.4
+    , mtl             ^>=2.2
+    , servant         ^>=0.19
+    , servant-server  ^>=0.19
+    , wai             ^>=3.2
+    , warp            ^>=3.3
 
 test-suite servant-effectful-test
   import:         common-extensions
