@@ -1,8 +1,9 @@
 {-# LANGUAGE NoOverloadedStrings #-}
+
 module Main where
 
-import Prelude hiding (lookup)
 import Test.Tasty
+import Prelude hiding (lookup)
 
 main :: IO ()
-main = defaultMain $ testGroup "servant-effectful" [ ]
+main = defaultMain $ testGroup "servant-effectful" []
