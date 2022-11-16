@@ -2,7 +2,8 @@ module Utils
   ( assertBool
   , assertEqual
   , assertFailure
-  ) where
+  )
+where
 
 import GHC.Stack
 import qualified Test.Tasty.HUnit as T
