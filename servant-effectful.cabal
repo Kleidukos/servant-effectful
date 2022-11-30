@@ -52,7 +52,7 @@ library
   exposed-modules: Effectful.Servant
   build-depends:
     , base            <5
-    , effectful-core  ^>=1.0.0.0 && <3.0
+    , effectful-core  ^>=2.2
     , hashable        ^>=1.4
     , mtl             ^>=2.2
     , servant         ^>=0.19
