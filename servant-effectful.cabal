@@ -16,6 +16,8 @@ extra-source-files:
   LICENSE.md
   README.md
 
+tested-with: GHC ==9.2.8 || ==9.4.7 || ==9.6.3
+
 source-repository head
   type:     git
   location: https://github.com/haskell-effectful/servant-effectful
