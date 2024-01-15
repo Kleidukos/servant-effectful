@@ -51,15 +51,18 @@ library
   import:          common-extensions
   import:          common-ghc-options
   hs-source-dirs:  src
-  exposed-modules: Effectful.Servant
+  exposed-modules:
+    Effectful.Servant
+    Effectful.Servant.Generic
+
   build-depends:
     , base            <5
     , effectful-core  ^>=2.3
     , mtl             >=2
-    , servant-server  ^>=0.20
-    , warp            ^>=3.3
-    , wai             ^>=3.2
     , network         >=2.3
+    , servant-server  ^>=0.20
+    , wai             ^>=3.2
+    , warp            ^>=3.3
 
 test-suite servant-effectful-test
   import:         common-extensions
