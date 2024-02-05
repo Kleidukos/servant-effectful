@@ -11,6 +11,9 @@ module Effectful.Servant.Generic
 
     -- * helpers
   , serveEff
+
+   -- * types
+  , GenericServantConstraints
   )
 where
 
