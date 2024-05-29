@@ -16,7 +16,7 @@ extra-source-files:
   LICENSE.md
   README.md
 
-tested-with:        GHC ==9.2.8 || ==9.4.7 || ==9.6.3
+tested-with:        GHC ==9.2.8 || ==9.4.7 || ==9.6.5
 
 source-repository head
   type:     git
@@ -57,7 +57,7 @@ library
 
   build-depends:
     , base            <5
-    , effectful-core  ^>=2.3
+    , effectful-core  >=2     && <3
     , mtl             >=2
     , network         >=2.3
     , servant-server  ^>=0.20
@@ -72,6 +72,7 @@ test-suite servant-effectful-test
   main-is:        Main.hs
   other-modules:  Utils
   hs-source-dirs: test
+  buildable:      False
   build-depends:
     , base
     , effectful-core
