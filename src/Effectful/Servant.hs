@@ -21,6 +21,7 @@ import Effectful.Dispatch.Static.Primitive (Env, cloneEnv)
 import Effectful.Error.Static
 import qualified Network.Wai.Handler.Warp as Warp
 import Servant hiding ((:>))
+import qualified Network.Wai as Wai
 
 -- | Deploy an effectful server.
 runWarpServerSettings
@@ -28,9 +29,9 @@ runWarpServerSettings
    . (HasServer api '[], IOE :> es)
   => Warp.Settings
   -> ServerT api (Eff (Error ServerError : es))
+  -> Wai.Middleware
   -> Eff es ()
-runWarpServerSettings settings =
-  runWarpServerSettingsContext @api settings EmptyContext
+runWarpServerSettings settings = runWarpServerSettingsContext @api settings EmptyContext
 
 -- | Deploy an effectful server with a context.
 runWarpServerSettingsContext
@@ -39,10 +40,11 @@ runWarpServerSettingsContext
   => Warp.Settings
   -> Context context
   -> ServerT api (Eff (Error ServerError : es))
+  -> Wai.Middleware
   -> Eff es ()
-runWarpServerSettingsContext settings ctx server = do
+runWarpServerSettingsContext settings context server middleware = do
   unsafeEff $ \es -> do
-    Warp.runSettings settings (serveEff @api es ctx server)
+    Warp.runSettings settings (middleware (serveEff @api es context server))
 
 -- | Convert an effectful server into a wai application.
 serveEff
