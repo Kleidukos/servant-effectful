@@ -61,8 +61,8 @@ library
     , mtl             >=2
     , network         >=2.3
     , servant-server  ^>=0.20
-    , wai             ^>=3.3
-    , warp            ^>=3.5
+    , wai             >=3.2
+    , warp            >=3.4
 
 test-suite servant-effectful-test
   import:         common-extensions

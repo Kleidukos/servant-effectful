@@ -3,3 +3,4 @@ dist-newstyle
 .hspec-failures
 .direnv
 result
+cabal.project.local
